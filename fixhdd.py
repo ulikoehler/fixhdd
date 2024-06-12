@@ -137,9 +137,9 @@ def getBadSectors(device):
             # and we want to extract the range
             print(f"Found bad sector in syslog: '{line}'")
             if "block in range" in line:
-                sector = int(line.split("block in range")[-1].strip().split(" ")[0])
+                sector = int(line.split("block in range")[-1].strip().split(" ")[0].strip().strip(","))
             elif "logical block" in line:
-                sector = int(line.split("logical block")[-1].strip().split(" ")[0])
+                sector = int(line.split("logical block")[-1].strip().split(" ")[0].strip().strip(","))
             yield sector
     except subprocess.CalledProcessError:
         #usually this indicates grep has not found anything
