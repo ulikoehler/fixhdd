@@ -134,8 +134,8 @@ def getBadSectors(device):
             line = line.strip()
             if not line: continue
             # Line is like [72058.852747] Buffer I/O error on dev sdc, logical block in range 348160 + 0-2(12) , async page read
-            # and we want to extract the range
-            print(f"Found bad sector in syslog: '{line}'")
+            # and we want to extract the int(348160)
+            #print(f"Found bad sector in syslog: '{line}'")
             if "block in range" in line:
                 sector = int(line.split("block in range")[-1].strip().split(" ")[0].strip().strip(","))
             elif "logical block" in line:
