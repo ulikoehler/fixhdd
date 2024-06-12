@@ -129,11 +129,13 @@ def getBadSectors(device):
     "Parse a list of recently read bad sectors from the syslog"
     #TODO this gets ALL bad sectors from ALL devices, not only the selected device
     try:
-        out = str(subprocess.check_output('egrep "end_request: I/O error|print_req_error: I/O error" /var/log/syslog | grep %s' % device.split('/')[-1], shell=True))
+        out = str(subprocess.check_output('dmesg | egrep "Buffer I/O error on " | grep %s' % device.split('/')[-1], shell=True))
         for line in out.replace('\\n','\n').replace("'",'').split("\n"):
             line = line.strip()
             if not line: continue
-            sector = int(line.rpartition(" ")[2])
+            # Line is like [72058.852747] Buffer I/O error on dev sdc, logical block in range 348160 + 0-2(12) , async page read
+            # and we want to extract the range
+            sector = int(str.split("range ")[-1].split(" ")[0])
             yield sector
     except subprocess.CalledProcessError:
         #usually this indicates grep has not found anything
