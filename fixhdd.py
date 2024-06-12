@@ -133,17 +133,18 @@ def getBadSectors(device):
         for line in out.replace('\\n','\n').replace("'",'').split("\n"):
             line = line.strip()
             if not line: continue
+            line = line.decode("iso-8859-1") # In contrast to UTF-8, this encoding can't fail
             # Line is like [72058.852747] Buffer I/O error on dev sdc, logical block in range 348160 + 0-2(12) , async page read
             # and we want to extract the range
-            print(f"Found bad sector in syslog: {line}")
-            sector = int(str.split("range ")[-1].split(" ")[0])
+            print(f"Found bad sector in syslog: '{line}'")
+            sector = int(str.split("block in range")[-1].strip().split(" ")[0])
             yield sector
     except subprocess.CalledProcessError:
         #usually this indicates grep has not found anything
         return
 
 
-def isSectorBad(device, sector):
+def isSectorBad(device, sector)
     try:
         output = subprocess.check_output('hdparm --read-sector %d %s' % (sector, device), shell=True, stderr=subprocess.STDOUT)
         output = output.decode("utf-8")
