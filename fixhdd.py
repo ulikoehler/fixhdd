@@ -190,7 +190,7 @@ def resetSectorHDParm(device, sector):
   
 def fixBadSectors(device, badSectors, around=1000):
     "One-shot fixing of bad sectors"
-    print(f"Checking/Fixing {len(badSectors)} sectors +- {around}"))
+    print(f"Checking/Fixing {len(badSectors)} sectors +- {around}")
     for badSector in badSectors:
         print(f"  Checking/Fixing sector {badSector}")
         for sector in range(badSector-around, badSector+around):
