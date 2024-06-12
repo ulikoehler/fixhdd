@@ -188,12 +188,15 @@ def resetSectorHDParm(device, sector):
     else:
         print(("Sector %d (%s) is OK, ignoring" % (sector,device)))
   
-def fixBadSectors(device, badSectors):
+def fixBadSectors(device, badSectors, around=1000):
     "One-shot fixing of bad sectors"
-    print(("Checking/Fixing %d sectors" % len(badSectors)))
-    [resetSectorHDParm(device, sector) for sector in badSectors]
+    print(f"Checking/Fixing {len(badSectors)} sectors +- {around}"))
+    for badSector in badSectors:
+        print(f"  Checking/Fixing sector {badSector}")
+        for sector in range(badSector-around, badSector+around):
+            resetSectorHDParm(device, sector)
       
-def checkDmesgBadSectors(device, knownGoodSectors, feedback=True):
+def checkDmesgBadSectors(device, knownGoodSectors, feedback=True, around=1000):
     #Grab sector list from dmesg
     devices=device
     if type(device) != type([]):
@@ -207,10 +210,12 @@ def checkDmesgBadSectors(device, knownGoodSectors, feedback=True):
                print ("No new sector errors found in syslog for device %s:-)" % device)
        else:
            #Update set of sectors which are known to be good
-           fixBadSectors(device, dmesgBadSectors)
+           fixBadSectors(device, dmesgBadSectors, around=around)
+           # NOTE: We intentionally do not add the "around" sectors
+           # to the known good sectors, it's fine to re-check them.
            knownGoodSectors.update(dmesgBadSectors)
 
-def loopCheckForBadSectors(device, feedback=True):
+def loopCheckForBadSectors(device, feedback=True, around=1000):
     knownGoodSectors = set()
     devices=device
     if type(device) != type([]):
@@ -221,7 +226,7 @@ def loopCheckForBadSectors(device, feedback=True):
         time.sleep(5)
         #Try again after timeout
         for device in devices:
-            checkDmesgBadSectors(device, knownGoodSectors, feedback)
+            checkDmesgBadSectors(device, knownGoodSectors, feedback, around=around)
 
 def isBlockDevice(filename):
     "Return if the given filename represents a valid block device"
@@ -250,7 +255,7 @@ if __name__ == "__main__":
     parser.add_argument("--loop", action="store_true", help="Loop and scan for bad sectors every few seconds. By using 'all' as device, it will scan all disks in the system. (VERY DANGEROUS!!)")
     parser.add_argument("-a", "--active-scan", action="store_true", help="Actively scan all blocks for errors. Use --offset to start at a specific block.")
     parser.add_argument("-o", "--offset", default=0, type=int, help="For active scan, the block to start at")
-    parser.add_argument("-n", default=1000, type=int, help="For active scan, the number of blocks to scan")
+    parser.add_argument("-n", default=1000, type=int, help="For active scan, the number of blocks to scan. For --loop, the number of blocks around a detected defective block to scan.")
     parser.add_argument("device", help="The device to use, e.g. /dev/sda")
     args = parser.parse_args()
 
@@ -284,5 +289,5 @@ if __name__ == "__main__":
            else:
                print( "Cancelling execution... fiu... :)" )
         else:
-           loopCheckForBadSectors(args.device)
+           loopCheckForBadSectors(args.device, around=args.n)
 
