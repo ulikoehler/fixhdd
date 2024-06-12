@@ -136,7 +136,11 @@ def getBadSectors(device):
             # Line is like [72058.852747] Buffer I/O error on dev sdc, logical block in range 348160 + 0-2(12) , async page read
             # and we want to extract the int(348160)
             #print(f"Found bad sector in syslog: '{line}'")
-            sector = int(line.rpartition(" ")[2])
+            if "sector in range" in line:
+                # Line like ... blk_update_request: I/O error, dev sdc, sector in range 3725357056 + 0-2(12)
+                sector = int(line.rpartition(" range ")[-1].partition(" ")[0].strip())
+            else: # Line like ... blk_update_request: I/O error, dev sdc, sector 3725359712
+                sector = int(line.rpartition(" ")[2])
             yield sector
     except subprocess.CalledProcessError:
         #usually this indicates grep has not found anything
