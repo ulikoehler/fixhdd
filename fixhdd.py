@@ -156,7 +156,11 @@ def isSectorBad(device, sector):
             return True
         # Else: Success => sector is not bad
         return False
-    except:
+    except KeyboardInterrupt:
+        return False
+    except Exception as ex:
+        # DO NOT consider the sector defective e.g. on keyboard interrupt
+        print("Exception while running hdparm: ", ex)
         return True
 
 
@@ -172,7 +176,9 @@ def resetSectorHDParm(device, sector):
 	#ps from hradec: If your disk is in a ZFS ZRAID, don't worry... running a scrub after fixing the bad sector
         #                will re-create any lost data on the disk. Just don't do it in more than one disk at a time, 
         #                and allways run scrub before attempting another disk!
-        out = subprocess.check_output('hdparm --write-sector  %d --yes-i-know-what-i-am-doing %s' % (sector, device), shell=True)
+        cmd = 'hdparm --write-sector  %d --yes-i-know-what-i-am-doing %s' % (sector, device)
+        print(f'Running {cmd}')
+        out = subprocess.check_output(cmd, shell=True)
         out = out.decode("utf-8")
         if "succeeded" not in out:
             print (red(out.decode("utf-8").replace("\n")))
@@ -242,7 +248,7 @@ if __name__ == "__main__":
     parser.add_argument("-a", "--active-scan", action="store_true", help="Actively scan all blocks for errors. Use --offset to start at a specific block.")
     parser.add_argument("-o", "--offset", default=0, type=int, help="For active scan, the block to start at")
     parser.add_argument("-n", default=1000, type=int, help="For active scan, the number of blocks to scan")
-    parser.add_argument("device", default="/dev/sda", help="The device to use")
+    parser.add_argument("device", help="The device to use, e.g. /dev/sda")
     args = parser.parse_args()
 
     if input(DISCLAIMER+'Are you sure you want to use this script? (Yes/No) ') != 'Yes':
