@@ -148,7 +148,9 @@ def getBadSectors(device):
 
 def isSectorBad(device, sector):
     try:
-        output = subprocess.check_output('hdparm --read-sector %d %s' % (sector, device), shell=True, stderr=subprocess.STDOUT)
+        cmd = 'hdparm --read-sector %d %s' % (sector, device)
+        print(f"Running hdparm: {cmd}")
+        output = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
         output = output.decode("utf-8")
         # Special case: process succeeds but with error message:
         # SG_IO: bad/missing sense data
