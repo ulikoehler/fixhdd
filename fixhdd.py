@@ -260,6 +260,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if input(DISCLAIMER+'Are you sure you want to use this script? (Yes/No) ').lower() != 'yes':
+        print("You didn't answer 'Yes', exiting without changing your HDD...")
         sys.exit(0)
 
     if args.device != "all":
