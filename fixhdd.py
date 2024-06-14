@@ -235,7 +235,7 @@ def isBlockDevice(filename):
 def getNumberOfSectors(device):
     "Get the physical number of LBAs for the given device"
     #Line like: 255 heads, 63 sectors/track, 60801 cylinders, total 976773168 sectors
-    sectorsLine = subprocess.check_output("LANG=C fdisk -l {0} 2>/dev/null | grep ^Disk | grep sectors".format(device), shell=True)
+    sectorsLine = subprocess.check_output(f"LANG=C fdisk -l {device} 2>/dev/null | grep ^Disk | grep sectors", shell=True)
     print(sectorsLine)
     return int(sectorsLine.strip().split(b" ")[-2])
 
