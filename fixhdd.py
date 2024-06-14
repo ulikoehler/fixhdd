@@ -170,6 +170,7 @@ def isSectorBad(device, sector):
         # SG_IO: bad/missing sense data
         if "bad/missing sense data" in output:
             return True
+        # Spec
         # Else: Success => sector is not bad
         return False
     except KeyboardInterrupt:
@@ -277,18 +278,18 @@ if __name__ == "__main__":
         sys.exit(0)
 
     if args.device != "all":
-     #Check if the given device is a block device after all
-     if not isBlockDevice(args.device):
-        print("Error: device argument must be a block device")
-        sys.exit(1)
-     print(("Trying to fix bad sectors on %s" % args.device))
-     # Always perform one-shot test
-     checkDmesgBadSectors(args.device, set())
-     # Fix manually added bad sector list
-     fixBadSectors(args.device, args.sector)
-     # Active sector scan
-     if args.active_scan:
-        performActiveSectorScan(args.device, args.offset, args.n)
+        #Check if the given device is a block device after all
+        if not isBlockDevice(args.device):
+            print("Error: device argument must be a block device")
+            sys.exit(1)
+        print(("Trying to fix bad sectors on %s" % args.device))
+        # Always perform one-shot test
+        checkDmesgBadSectors(args.device, set(), around=args.n)
+        # Fix manually added bad sector list
+        fixBadSectors(args.device, args.sector, around=args.n)
+        # Active sector scan
+        if args.active_scan:
+            performActiveSectorScan(args.device, offset=args.offset, n=args.n)
 
     # If enabled, loop-check
     if args.loop:
