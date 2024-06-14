@@ -259,7 +259,7 @@ if __name__ == "__main__":
     parser.add_argument("device", help="The device to use, e.g. /dev/sda")
     args = parser.parse_args()
 
-    if input(DISCLAIMER+'Are you sure you want to use this script? (Yes/No) ') != 'Yes':
+    if input(DISCLAIMER+'Are you sure you want to use this script? (Yes/No) ').lower() != 'yes':
         sys.exit(0)
 
     if args.device != "all":
