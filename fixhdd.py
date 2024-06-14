@@ -241,7 +241,7 @@ def getNumberOfSectors(device):
 
 def performActiveSectorScan(device, offset=0, n=1000):
     "Check all sectors on the hard drive for errors and fix them."
-    print(("Performing active sector scan of {0} starting at {1}").format(device, offset))
+    print(f"Performing active sector scan of {device} starting at {offset}")
     print((getNumberOfSectors(device)))
     for i in range(offset, min(getNumberOfSectors(device), offset + n)):
         #Reset sector (only if it is damaged)
