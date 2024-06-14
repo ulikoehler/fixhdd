@@ -163,7 +163,7 @@ def getBadSectors(device):
 def isSectorBad(device, sector):
     try:
         cmd = 'hdparm --read-sector %d %s' % (sector, device)
-        print(f"Running hdparm: {cmd}")
+        # print(f"Running hdparm: {cmd}")
         output = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
         output = output.decode("utf-8")
         # Special case: process succeeds but with error message:
