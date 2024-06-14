@@ -193,7 +193,7 @@ def fixBadSectors(device, badSectors, around=1000):
     print(f"Checking/Fixing {len(badSectors)} sectors +- {around}")
     for badSector in badSectors:
         print(f"  Checking/Fixing sector {badSector}")
-        for sector in range(badSector-around, badSector+around):
+        for sector in range(max(badSector-around, 0), badSector+around):
             resetSectorHDParm(device, sector)
       
 def checkDmesgBadSectors(device, knownGoodSectors, feedback=True, around=1000):
