@@ -207,7 +207,7 @@ def checkDmesgBadSectors(device, knownGoodSectors, feedback=True, around=1000):
        dmesgBadSectors.difference_update(knownGoodSectors)
        if len(dmesgBadSectors) == 0:
            if feedback == True:
-               print ("No new sector errors found in syslog for device %s:-)" % device)
+               print ("No new sector errors found in syslog for device %s :-)" % device)
        else:
            #Update set of sectors which are known to be good
            fixBadSectors(device, dmesgBadSectors, around=around)
@@ -286,7 +286,7 @@ if __name__ == "__main__":
                out = subprocess.check_output("/usr/bin/lsscsi  | awk '{print $(NF)}' | grep -v '\-'", shell=True)
                out = [ x.strip() for x in out.decode("utf-8").split('\n') if len(x.strip()) != 0 ]
                # when running as "all", don't spit out idle messages.
-               loopCheckForBadSectors(out, feedback=False)
+               loopCheckForBadSectors(out, feedback=False, around=args.n)
            else:
                print( "Cancelling execution... fiu... :)" )
         else:
