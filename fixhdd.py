@@ -45,6 +45,7 @@ import subprocess
 import time
 import os
 import stat
+import re
 import sys
 
 __author__ = "Uli Köhler"
@@ -124,6 +125,18 @@ DISCLAIMER2 = '''
 Are you REALLY sure you want to run with '--loop all'? (Yes I am sure!/No) '''
 
 
+def extract_sector_number(line):
+    match = re.search(r'sector (\d+)', line)
+    if match:
+        return int(match.group(1))
+    else:
+        return None
+
+# Example usage
+#line = "[ 9519.879705] blk_update_request: I/O error, dev sda, sector 108487864 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0"
+#sector_number = extract_sector_number(line)
+#print(f"Sector number: {sector_number}")
+
 #Get list of recent bad sectors via dmesg
 def getBadSectors(device):
     "Parse a list of recently read bad sectors from the syslog"
@@ -140,7 +153,7 @@ def getBadSectors(device):
                 # Line like ... blk_update_request: I/O error, dev sdc, sector in range 3725357056 + 0-2(12)
                 sector = int(line.rpartition(" range ")[-1].partition(" ")[0].strip())
             else: # Line like ... blk_update_request: I/O error, dev sdc, sector 3725359712
-                sector = int(line.rpartition(" ")[2])
+                sector = extract_sector_number(line)
             yield sector
     except subprocess.CalledProcessError:
         #usually this indicates grep has not found anything
